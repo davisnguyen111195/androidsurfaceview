@@ -28,30 +28,35 @@ class GamePanel constructor(myContext: Context) : SurfaceView(myContext), Surfac
     fun render() {
         val canvas: Canvas = holder.lockCanvas()
         canvas.drawColor(Color.BLACK)
-        for (square in squares) {
-            square.onDrawSquare(canvas)
+        synchronized(squares) {
+            for (square in squares) {
+                square.onDrawSquare(canvas)
+            }
         }
-
         holder.unlockCanvasAndPost(canvas)
     }
 
     fun update(delta: Double) {
-        for (square in squares) {
-            square.move(delta)
+        synchronized(squares) {
+            for (square in squares) {
+                square.move(delta)
+            }
         }
     }
 
     override fun onTouchEvent(event: MotionEvent?): Boolean {
         if (event != null && event.action == MotionEvent.ACTION_DOWN) {
             val pos = PointF(event.x, event.y)
-            val size = 5F + random.nextInt(100)
+            val size = 25F + random.nextInt(100)
             val color = Color.rgb(
                 random.nextInt(256),
                 random.nextInt(256),
                 random.nextInt(256)
             )
+            synchronized(squares) {
+                squares.add(Square(pos, size, color))
+            }
 
-            squares.add(Square(pos, size, color))
 
             //render()
             //update()
@@ -89,15 +94,16 @@ class GamePanel constructor(myContext: Context) : SurfaceView(myContext), Surfac
 
         fun move(delta: Double) {
             inPos.x += (xDir * delta * 300).toFloat()
-            if (inPos.x >= 1080 || inPos.x <= 0) {
+            if (inPos.x + inSize >= 1080 || inPos.x <= 0) {
                 xDir *= -1
             }
 
-                inPos.y += (yDir * delta * 300).toFloat()
-                if (inPos.y >= 2220 || inPos.y <= 0) {
-                    yDir *= -1
-                }
+            inPos.y += (yDir * delta * 300).toFloat()
+            if (inPos.y + inSize >= 2220 || inPos.y <= 0) {
+                yDir *= -1
+            }
         }
+
         fun onDrawSquare(canvas: Canvas) {
             canvas.drawRect(inPos.x, inPos.y, inPos.x + inSize, inPos.y + inSize, paint)
         }
