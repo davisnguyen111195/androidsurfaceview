@@ -25,24 +25,27 @@ class GamePanel constructor(myContext: Context) : SurfaceView(myContext), Surfac
     private var random = java.util.Random()
     private lateinit var gameLoop: GameLoop
     private var position: PointF = PointF()
-    private val skeleton = ArrayList<PointF>()
+    private val skeletons = ArrayList<PointF>()
     private var playerFaceDirection: Int = GameConstaints.DOWN
     private var playerAniIndexY: Int = 0
     private var aniTick: Int = 0
     private var aniSpeed: Int = 10
+    private var skeletonPos : PointF = PointF(0F, 0F)
+    private var skeletonTime = System.currentTimeMillis()
+    private var skeletonDir = GameConstaints.DOWN
 
     init {
         holder.addCallback(this)
         redPaint.setColor(Color.RED)
         gameLoop = GameLoop(this)
-        for (i in 1..10) {
-            skeleton.add(
-                PointF(
-                    random.nextInt(1080).toFloat(),
-                    random.nextInt(2220).toFloat()
-                )
-            )
-        }
+//        for (i in 1..10) {
+//            skeletons.add(
+//                PointF(
+//                    random.nextInt(1080).toFloat(),
+//                    random.nextInt(2220).toFloat()
+//                )
+//            )
+//        }
     }
 
     fun render() {
@@ -56,12 +59,14 @@ class GamePanel constructor(myContext: Context) : SurfaceView(myContext), Surfac
 
         //canvas.drawBitmap(GameCharacters.PLAYER.getSpriteSheet(), 500F, 500F, null)
         GameCharacters.PLAYER.getSprite(playerAniIndexY, playerFaceDirection)?.let {
-            canvas.drawBitmap(it, 200F, 200F, null)
+            canvas.drawBitmap(it, position.x, position.y, null)
         }
 
 
 
-
+        GameCharacters.SKELETON.getSprite(playerAniIndexY, skeletonDir)?.let{
+            canvas.drawBitmap(it, skeletonPos.x, skeletonPos.y, null)
+        }
 //        for (pos in skeleton) {
 //            GameCharacters.SKELETON.getSprite(6, 3)?.let {
 //                canvas.drawBitmap(
@@ -90,15 +95,48 @@ class GamePanel constructor(myContext: Context) : SurfaceView(myContext), Surfac
 //            }
 //            //pos.x += (delta * 300).toFloat()
 //        }
+
+
+        if(System.currentTimeMillis() - skeletonTime >= 5000){
+            skeletonDir = random.nextInt(4)
+            skeletonTime = System.currentTimeMillis()
+        }
+
         updateAnimation(delta)
+
+        when(skeletonDir){
+            GameConstaints.DOWN -> {
+                skeletonPos.y += (delta * 300).toFloat()
+                if(skeletonPos.y >= 2220)
+                    skeletonDir = GameConstaints.UP
+            }
+            GameConstaints.UP -> {
+                skeletonPos.y -= (delta * 300).toFloat()
+                if(skeletonPos.y <= 0)
+                    skeletonDir = GameConstaints.DOWN
+            }
+
+            GameConstaints.RIGHT -> {
+                skeletonPos.x += (delta * 300).toFloat()
+                if(skeletonPos.x >= 1080)
+                    skeletonDir = GameConstaints.LEFT
+            }
+            GameConstaints.LEFT -> {
+                skeletonPos.x -= (delta * 300).toFloat()
+                if(skeletonPos.x <= 0)
+                    skeletonDir = GameConstaints.RIGHT
+            }
+        }
+
+
     }
 
-    private fun updateAnimation(delta: Double){
+    private fun updateAnimation(delta: Double) {
         aniTick++
-        if(aniTick >= aniSpeed){
+        if (aniTick >= aniSpeed) {
             aniTick = 0
             playerAniIndexY++
-            if(playerAniIndexY >= 4){
+            if (playerAniIndexY >= 4) {
                 playerAniIndexY = 0
             }
         }
@@ -117,9 +155,37 @@ class GamePanel constructor(myContext: Context) : SurfaceView(myContext), Surfac
 //            synchronized(squares) {
 //                squares.add(Square(pos, size, color))
 //            }
+            val newX = event.x
+            val newY = event.y
 
-            position.x = event.x
-            position.y = event.y
+            val xDiff = Math.abs(newX - position.x)
+            val yDiff = Math.abs(newY - position.y)
+            if (xDiff > yDiff) {
+                if (newX > position.x){
+                    playerFaceDirection = GameConstaints.RIGHT
+                    skeletonDir = GameConstaints.RIGHT
+                }
+
+                else{
+                    playerFaceDirection = GameConstaints.LEFT
+                    skeletonDir = GameConstaints.LEFT
+                }
+
+            } else {
+                if (newY > position.y){
+                    playerFaceDirection = GameConstaints.DOWN
+                    skeletonDir = GameConstaints.DOWN
+                }
+
+                else{
+                    playerFaceDirection = GameConstaints.UP
+                    skeletonDir = GameConstaints.UP
+                }
+
+            }
+
+            position.x = newX
+            position.y = newY
 
         }
         return true
