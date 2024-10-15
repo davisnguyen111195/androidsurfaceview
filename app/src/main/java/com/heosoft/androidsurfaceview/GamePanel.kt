@@ -50,23 +50,27 @@ class GamePanel constructor(myContext: Context) : SurfaceView(myContext), Surfac
 
     fun render() {
         val canvas: Canvas = holder.lockCanvas()
-        canvas.drawColor(Color.BLACK)
+        canvas.drawColor(Color.WHITE)
 //        synchronized(squares) {
 //            for (square in squares) {
 //                square.onDrawSquare(canvas)
 //            }
 //        }
 
-        //canvas.drawBitmap(GameCharacters.PLAYER.getSpriteSheet(), 500F, 500F, null)
-        GameCharacters.PLAYER.getSprite(playerAniIndexY, playerFaceDirection)?.let {
+        GameCharacters.MCC.getSprite(0, 0)?.let {
             canvas.drawBitmap(it, position.x, position.y, null)
         }
 
+        //canvas.drawBitmap(GameCharacters.PLAYER.getSpriteSheet(), 500F, 500F, null)
+//        GameCharacters.PLAYER.getSprite(playerAniIndexY, playerFaceDirection)?.let {
+//            canvas.drawBitmap(it, position.x, position.y, null)
+//        }
 
 
-        GameCharacters.SKELETON.getSprite(playerAniIndexY, skeletonDir)?.let{
-            canvas.drawBitmap(it, skeletonPos.x, skeletonPos.y, null)
-        }
+
+//        GameCharacters.SKELETON.getSprite(playerAniIndexY, skeletonDir)?.let{
+//            canvas.drawBitmap(it, skeletonPos.x, skeletonPos.y, null)
+//        }
 //        for (pos in skeleton) {
 //            GameCharacters.SKELETON.getSprite(6, 3)?.let {
 //                canvas.drawBitmap(
@@ -96,37 +100,37 @@ class GamePanel constructor(myContext: Context) : SurfaceView(myContext), Surfac
 //            //pos.x += (delta * 300).toFloat()
 //        }
 
-
-        if(System.currentTimeMillis() - skeletonTime >= 5000){
-            skeletonDir = random.nextInt(4)
-            skeletonTime = System.currentTimeMillis()
-        }
-
-        updateAnimation(delta)
-
-        when(skeletonDir){
-            GameConstaints.DOWN -> {
-                skeletonPos.y += (delta * 300).toFloat()
-                if(skeletonPos.y >= 2220)
-                    skeletonDir = GameConstaints.UP
-            }
-            GameConstaints.UP -> {
-                skeletonPos.y -= (delta * 300).toFloat()
-                if(skeletonPos.y <= 0)
-                    skeletonDir = GameConstaints.DOWN
-            }
-
-            GameConstaints.RIGHT -> {
-                skeletonPos.x += (delta * 300).toFloat()
-                if(skeletonPos.x >= 1080)
-                    skeletonDir = GameConstaints.LEFT
-            }
-            GameConstaints.LEFT -> {
-                skeletonPos.x -= (delta * 300).toFloat()
-                if(skeletonPos.x <= 0)
-                    skeletonDir = GameConstaints.RIGHT
-            }
-        }
+//
+//        if(System.currentTimeMillis() - skeletonTime >= 5000){
+//            skeletonDir = random.nextInt(4)
+//            skeletonTime = System.currentTimeMillis()
+//        }
+//
+//        updateAnimation(delta)
+//
+//        when(skeletonDir){
+//            GameConstaints.DOWN -> {
+//                skeletonPos.y += (delta * 300).toFloat()
+//                if(skeletonPos.y >= 2220)
+//                    skeletonDir = GameConstaints.UP
+//            }
+//            GameConstaints.UP -> {
+//                skeletonPos.y -= (delta * 300).toFloat()
+//                if(skeletonPos.y <= 0)
+//                    skeletonDir = GameConstaints.DOWN
+//            }
+//
+//            GameConstaints.RIGHT -> {
+//                skeletonPos.x += (delta * 300).toFloat()
+//                if(skeletonPos.x >= 1080)
+//                    skeletonDir = GameConstaints.LEFT
+//            }
+//            GameConstaints.LEFT -> {
+//                skeletonPos.x -= (delta * 300).toFloat()
+//                if(skeletonPos.x <= 0)
+//                    skeletonDir = GameConstaints.RIGHT
+//            }
+//        }
 
 
     }
